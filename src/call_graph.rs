@@ -34,6 +34,20 @@ impl<'m> CallGraph<'m> {
                         Constant::GlobalReference { name, .. } => {
                             graph.add_edge(caller, name, ());
                         }
+                        Constant::BitCast(llvm_ir::constant::BitCast { operand, .. }) => {
+                            match operand.as_ref() {
+                                Constant::GlobalReference { name, .. } => {
+                                    graph.add_edge(caller, name, ());
+                                }
+                                _ => {
+                                    for target in
+                                        functions_by_type.functions_with_type(&call.callee_ty())
+                                    {
+                                        graph.add_edge(caller, target, ());
+                                    }
+                                }
+                            }
+                        }
                         _ => {
                             // a constant function pointer.
                             // Assume that this function pointer could point
