@@ -44,8 +44,8 @@ fn call_graph() {
 
     // none of these functions have calls or are called
     for func_name in FUNC_NAMES {
-        assert_eq!(callgraph.callers(func_name).count(), 0);
-        assert_eq!(callgraph.callees(func_name).count(), 0);
+        assert_eq!(callgraph.callers(func_name).unwrap().count(), 0);
+        assert_eq!(callgraph.callees(func_name).unwrap().count(), 0);
     }
 }
 

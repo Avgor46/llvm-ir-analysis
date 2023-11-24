@@ -8,6 +8,7 @@ mod call_graph;
 mod control_dep_graph;
 mod control_flow_graph;
 mod dominator_tree;
+mod error;
 mod functions_by_type;
 
 pub use crate::call_graph::CallGraph;

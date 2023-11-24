@@ -1,3 +1,4 @@
+use crate::error::{self, Result};
 use crate::functions_by_type::FunctionsByType;
 use either::Either;
 use llvm_ir::{
@@ -105,16 +106,17 @@ impl<'m> CallGraph<'m> {
     /// This analysis conservatively assumes that function pointers may point to
     /// any function in the analyzed `Module`(s) that has the appropriate type.
     ///
-    /// Panics if the given function is not found in the analyzed `Module`(s).
-    pub fn callers<'s>(&'s self, func_name: &'m str) -> impl Iterator<Item = &'m str> + 's {
+    /// Error if the given function is not found in the analyzed `Module`(s).
+    pub fn callers<'s>(&'s self, func_name: &'m str) -> Result<impl Iterator<Item = &'m str> + 's> {
         if !self.graph.contains_node(func_name) {
-            panic!(
+            return Err(error::Error::CallGraph(format!(
                 "callers(): function named {:?} not found in the Module(s)",
                 func_name
-            )
+            )));
         }
-        self.graph
-            .neighbors_directed(func_name, Direction::Incoming)
+        Ok(self
+            .graph
+            .neighbors_directed(func_name, Direction::Incoming))
     }
 
     /// Get the names of functions in the analyzed `Module`(s) which may be
@@ -124,15 +126,16 @@ impl<'m> CallGraph<'m> {
     /// any function in the analyzed `Module`(s) that has the appropriate type.
     ///
     /// Panics if the given function is not found in the analyzed `Module`(s).
-    pub fn callees<'s>(&'s self, func_name: &'m str) -> impl Iterator<Item = &'m str> + 's {
+    pub fn callees<'s>(&'s self, func_name: &'m str) -> Result<impl Iterator<Item = &'m str> + 's> {
         if !self.graph.contains_node(func_name) {
-            panic!(
+            return Err(error::Error::CallGraph(format!(
                 "callees(): function named {:?} not found in the Module(s)",
                 func_name
-            )
+            )));
         }
-        self.graph
-            .neighbors_directed(func_name, Direction::Outgoing)
+        Ok(self
+            .graph
+            .neighbors_directed(func_name, Direction::Outgoing))
     }
 }
 
